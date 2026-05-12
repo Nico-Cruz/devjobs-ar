@@ -1,15 +1,8 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/*.js", "use": "@vercel/node" },
-    { "src": "index.html", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
-  ],
-  "env": {
-    "GOOGLE_API_KEY": "AIzaSyBV5kSOuP-OC1VOH1MBQFmDVt2oXkO4w-0",
-    "GOOGLE_CX": "c5328d13e20ba4413"
-  }
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
