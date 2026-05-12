@@ -398,6 +398,14 @@
     <button class="chip src-btn" onclick="setSource('social', this)">linkedin · x posts</button>
   </div>
 
+  <div class="filters" style="margin-top:-4px">
+    <button class="chip days-btn" onclick="setDays(1, this)">hoy</button>
+    <button class="chip days-btn" onclick="setDays(3, this)">3 días</button>
+    <button class="chip days-btn" onclick="setDays(7, this)">7 días</button>
+    <button class="chip days-btn active" onclick="setDays(15, this)">15 días</button>
+    <button class="chip days-btn" onclick="setDays(30, this)">30 días</button>
+  </div>
+
   <div class="stats">
     <div class="stat"><strong id="stat-total">—</strong> empleos</div>
     <div class="stat">actualizado <strong id="stat-time">—</strong></div>
@@ -433,6 +441,7 @@
   let gobPage = 1;
   let activeFilter = '';
   let activeSource = 'all';
+  let activeDays = 15; // máximo 15 días por defecto
   let searchQuery = '';
   let loading = false;
 
@@ -491,7 +500,10 @@
   }
 
   function filterJobs(jobs) {
+    const cutoff = Date.now() - activeDays * 24 * 60 * 60 * 1000;
     return jobs.filter(job => {
+      const matchDate = !job.published_at || new Date(job.published_at).getTime() >= cutoff;
+      if (!matchDate) return false;
       const matchSource = activeSource === 'all' || job.source === activeSource ||
         (activeSource === 'rss' && ['weworkremotely','remoteok'].includes(job.source)) ||
         (activeSource === 'social' && ['linkedin','x'].includes(job.source));
@@ -501,6 +513,13 @@
       const haystack = (job.title + ' ' + job.tags.join(' ')).toLowerCase();
       return haystack.includes(activeFilter);
     });
+  }
+
+  function setDays(d, btn) {
+    activeDays = d;
+    document.querySelectorAll('.days-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render(); updateStats();
   }
 
   const sourceLabel = { getonboard:'GetOnBoard', linkedin:'LinkedIn', weworkremotely:'WWR', remoteok:'RemoteOK', x:'X post' };
