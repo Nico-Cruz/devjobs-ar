@@ -2,19 +2,23 @@
 // Parsea RSS feeds de LinkedIn Jobs y We Work Remotely sin dependencias externas
 
 const FEEDS = {
-  linkedin: [
-    'https://www.linkedin.com/jobs/search/?keywords=desarrollador&location=Argentina&f_TPR=r86400&format=rss',
-    'https://www.linkedin.com/jobs/search/?keywords=developer&location=Argentina&f_TPR=r86400&format=rss',
-    'https://www.linkedin.com/jobs/search/?keywords=react+developer&location=Argentina&format=rss',
-    'https://www.linkedin.com/jobs/search/?keywords=python+developer&location=Argentina&format=rss',
+  bumeran: [
+    'https://www.bumeran.com.ar/empleos.html?recencia=15&rss=1',
+    'https://www.bumeran.com.ar/empleos-busqueda-desarrollador.html?rss=1',
+    'https://www.bumeran.com.ar/empleos-busqueda-programador.html?rss=1',
   ],
-  weworkremotely: [
-    'https://weworkremotely.com/categories/remote-programming-jobs.rss',
-    'https://weworkremotely.com/categories/remote-devops-sysadmin-jobs.rss',
+  computrabajo: [
+    'https://www.computrabajo.com.ar/ofertas-de-trabajo/ofertas-de-trabajo-de-informatica-y-telecomunicaciones?rss=1',
+    'https://www.computrabajo.com.ar/ofertas-de-trabajo/ofertas-de-trabajo-de-desarrollador?rss=1',
   ],
-  remoteok: [
-    'https://remoteok.com/remote-dev-jobs.rss',
-  ]
+  zonajobs: [
+    'https://www.zonajobs.com.ar/empleos/rss?q=desarrollador&l=argentina',
+    'https://www.zonajobs.com.ar/empleos/rss?q=programador&l=argentina',
+  ],
+  infojobs: [
+    'https://www.infojobs.com.ar/rss/ofertas.xhtml?keyword=desarrollador',
+    'https://www.infojobs.com.ar/rss/ofertas.xhtml?keyword=developer',
+  ],
 };
 
 let cache = { data: null, timestamp: 0 };
