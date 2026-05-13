@@ -213,8 +213,8 @@
 
 <script>
   let allJobs=[], gobPage=1, activeFilter='', activeSource='all', activeDays=15, searchQuery='', loading=false;
-  const AR_RSS=['bumeran','computrabajo','zonajobs','infojobs'];
-  const sourceLabel={getonboard:'GetOnBoard',linkedin:'LinkedIn',bumeran:'Bumeran',computrabajo:'Computrabajo',zonajobs:'ZonaJobs',infojobs:'InfoJobs',x:'X'};
+  const AR_RSS=['indeed'];
+  const sourceLabel={getonboard:'GetOnBoard',linkedin:'LinkedIn',indeed:'Indeed AR',x:'X'};
   const FAKE_IPS=['186.22.x.x','181.96.x.x','190.210.x.x','200.45.x.x','181.47.x.x','186.57.x.x','200.114.x.x','190.191.x.x','181.164.x.x','186.139.x.x'];
   const ALERT_JOBS=['React Developer','Python Engineer','Fullstack Node','Mobile Developer','DevOps Engineer','Data Analyst','Backend Python','Frontend React','Vue.js Dev','Node.js Backend'];
 
@@ -260,10 +260,20 @@
     ).join('');
   }
 
+  function parseDate(val) {
+    if (!val) return 0;
+    // Unix timestamp (segundos)
+    if (typeof val === 'number' || (typeof val === 'string' && /^\d{9,11}$/.test(val))) {
+      return Number(val) * 1000;
+    }
+    return new Date(val).getTime();
+  }
+
   function filterJobs(jobs){
     const cutoff=Date.now()-activeDays*24*60*60*1000;
     return jobs.filter(job=>{
-      const matchDate=!job.published_at||new Date(job.published_at).getTime()>=cutoff;
+      const jobTime = parseDate(job.published_at);
+      const matchDate = !job.published_at || jobTime >= cutoff;
       if(!matchDate)return false;
       const matchSource=activeSource==='all'||job.source===activeSource||
         (activeSource==='rss'&&AR_RSS.includes(job.source))||
@@ -306,7 +316,7 @@
     const gobCount=allJobs.filter(j=>j.source==='getonboard').length;
     const rssCount=allJobs.filter(j=>AR_RSS.includes(j.source)).length;
     const socialCount=allJobs.filter(j=>['linkedin','x'].includes(j.source)).length;
-    document.getElementById('stat-sources').textContent=`GetOnBoard (${gobCount}) · Portales (${rssCount}) · Posts (${socialCount})`;
+    document.getElementById('stat-sources').textContent=`GetOnBoard (${gobCount}) · Indeed AR (${rssCount}) · Posts (${socialCount})`;
   }
 
   function setFilter(f,btn){activeFilter=f;document.querySelectorAll('#filters .chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();updateStats();}
