@@ -2,22 +2,12 @@
 // Parsea RSS feeds de LinkedIn Jobs y We Work Remotely sin dependencias externas
 
 const FEEDS = {
-  bumeran: [
-    'https://www.bumeran.com.ar/empleos.html?recencia=15&rss=1',
-    'https://www.bumeran.com.ar/empleos-busqueda-desarrollador.html?rss=1',
-    'https://www.bumeran.com.ar/empleos-busqueda-programador.html?rss=1',
-  ],
-  computrabajo: [
-    'https://www.computrabajo.com.ar/ofertas-de-trabajo/ofertas-de-trabajo-de-informatica-y-telecomunicaciones?rss=1',
-    'https://www.computrabajo.com.ar/ofertas-de-trabajo/ofertas-de-trabajo-de-desarrollador?rss=1',
-  ],
-  zonajobs: [
-    'https://www.zonajobs.com.ar/empleos/rss?q=desarrollador&l=argentina',
-    'https://www.zonajobs.com.ar/empleos/rss?q=programador&l=argentina',
-  ],
-  infojobs: [
-    'https://www.infojobs.com.ar/rss/ofertas.xhtml?keyword=desarrollador',
-    'https://www.infojobs.com.ar/rss/ofertas.xhtml?keyword=developer',
+  indeed: [
+    'https://ar.indeed.com/rss?q=desarrollador&l=Argentina&sort=date',
+    'https://ar.indeed.com/rss?q=developer&l=Argentina&sort=date',
+    'https://ar.indeed.com/rss?q=programador&l=Argentina&sort=date',
+    'https://ar.indeed.com/rss?q=react+developer&l=Argentina&sort=date',
+    'https://ar.indeed.com/rss?q=python+developer&l=Argentina&sort=date',
   ],
 };
 

@@ -78,9 +78,11 @@ export default async function handler(req, res) {
   }
 }
 
-function timeAgo(dateStr) {
-  if (!dateStr) return 'reciente';
-  const diff = Date.now() - new Date(dateStr).getTime();
+function timeAgo(dateVal) {
+  if (!dateVal) return 'reciente';
+  // Unix timestamp en segundos
+  const ms = typeof dateVal === 'number' ? dateVal * 1000 : new Date(dateVal).getTime();
+  const diff = Date.now() - ms;
   const mins = Math.floor(diff / 60000);
   if (mins < 60) return `hace ${mins} min`;
   const hrs = Math.floor(mins / 60);
