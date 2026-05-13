@@ -235,15 +235,14 @@
     if(reset){gobPage=1;allJobs=[];}
     showSkeletons();
     try{
-      const[gobRes,rssRes,socialRes,compRes]=await Promise.allSettled([
+      const[gobRes,rssRes,searchRes]=await Promise.allSettled([
         fetch(`/api/jobs?page=${gobPage}&per_page=20${searchQuery?'&search='+encodeURIComponent(searchQuery):'&category=programming'}`),
-        fetch('/api/rss'),fetch('/api/social'),fetch('/api/companies')
+        fetch('/api/rss'),fetch('/api/search')
       ]);
       const gobJobs=gobRes.status==='fulfilled'&&gobRes.value.ok?(await gobRes.value.json()).jobs||[]:[];
       const rssJobs=rssRes.status==='fulfilled'&&rssRes.value.ok?(await rssRes.value.json()).jobs||[]:[];
-      const socialJobs=socialRes.status==='fulfilled'&&socialRes.value.ok?(await socialRes.value.json()).jobs||[]:[];
-      const compJobs=compRes.status==='fulfilled'&&compRes.value.ok?(await compRes.value.json()).jobs||[]:[];
-      const incoming=[...gobJobs,...rssJobs,...socialJobs,...compJobs];
+      const searchJobs=searchRes.status==='fulfilled'&&searchRes.value.ok?(await searchRes.value.json()).jobs||[]:[];
+      const incoming=[...gobJobs,...rssJobs,...searchJobs];
       allJobs=reset?incoming:[...allJobs,...incoming];
       const seen=new Set();
       allJobs=allJobs.filter(j=>{if(seen.has(j.url))return false;seen.add(j.url);return true;});
