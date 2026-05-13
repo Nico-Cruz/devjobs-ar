@@ -25,16 +25,16 @@ const QUERIES = [
 ];
 
 let cache = { data: null, timestamp: 0 };
-const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 horas — conservar queries
+const CACHE_TTL = 15 * 60 * 1000; // 15 minutos
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
-  const { type } = req.query; // ?type=social | company | all
+  const { type, nocache } = req.query;
 
   const now = Date.now();
-  if (cache.data && (now - cache.timestamp) < CACHE_TTL) {
+  if (!nocache && cache.data && (now - cache.timestamp) < CACHE_TTL) {
     const filtered = filterByType(cache.data, type);
     return res.json({ source: 'cache', jobs: filtered, total: filtered.length });
   }
