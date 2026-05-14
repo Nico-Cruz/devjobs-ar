@@ -38,18 +38,29 @@ export default async function handler(req, res) {
     });
   });
 
-  // Filtrar solo Argentina
+  // Filtrar solo Argentina — más estricto
   const arJobs = allJobs.filter(job => {
     const loc = (job.location || '').toLowerCase();
     return loc.includes('argentin') || loc.includes('buenos aires') ||
-           loc.includes('córdoba') || loc.includes('rosario') ||
-           loc.includes('remote') || loc.includes('remoto') || loc === '';
+           loc.includes('córdoba') || loc.includes('cordoba') ||
+           loc.includes('rosario') || loc.includes('mendoza') ||
+           loc.includes('la plata') || loc.includes('mar del plata') ||
+           loc.includes('salta') || loc === '';
   });
 
-  arJobs.sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
-  cache = { data: arJobs, timestamp: now };
+  // Deduplicar por título + empresa (Bluelight publica mismo job por ciudad)
+  const seen = new Set();
+  const dedupedJobs = arJobs.filter(job => {
+    const key = `${job.company}-${job.title}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 
-  return res.json({ source: 'live', jobs: arJobs, total: arJobs.length });
+  dedupedJobs.sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
+  cache = { data: dedupedJobs, timestamp: now };
+
+  return res.json({ source: 'live', jobs: dedupedJobs, total: dedupedJobs.length });
 }
 
 async function fetchGreenhouse({ name, token }) {
