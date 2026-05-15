@@ -9,6 +9,15 @@ const FEEDS = {
     'https://ar.indeed.com/rss?q=react+developer&l=Argentina&sort=date',
     'https://ar.indeed.com/rss?q=python+developer&l=Argentina&sort=date',
   ],
+  teamtailor: [
+    'https://naranjax.na.teamtailor.com/jobs.xml',
+    'https://global66.teamtailor.com/jobs.xml',
+    'https://magoya-1732912701.na.teamtailor.com/jobs.xml',
+    'https://bidcom.na.teamtailor.com/jobs.xml',
+    'https://crhtalentoenit.na.teamtailor.com/jobs.xml',
+    'https://inhaus.teamtailor.com/jobs.xml',
+    'https://vdh.teamtailor.com/jobs.xml',
+  ],
 };
 
 let cache = { data: null, timestamp: 0 };
