@@ -6,6 +6,8 @@ const GREENHOUSE_COMPANIES = [
   { name: 'Speechify', token: 'speechify' },
   { name: 'Varicent', token: 'varicent' },
   { name: 'Clara', token: 'clara' },
+  { name: 'Glovo', token: 'glovo' },
+  { name: 'Particle41', token: 'particle41llc' },
 ];
 
 const LEVER_COMPANIES = [
@@ -13,6 +15,12 @@ const LEVER_COMPANIES = [
   { name: 'Coderio', token: 'coderio' },
   { name: 'Bluelight', token: 'bluelightconsulting' },
   { name: 'Binance', token: 'binance' },
+  { name: 'Yuno', token: 'yuno' },
+  { name: 'SQUIRE', token: 'getsquire' },
+  { name: 'Allata', token: 'Allata' },
+  { name: 'Kavak', token: 'kavak' },
+  { name: 'Talent2Win', token: 'talent2win' },
+  { name: 'Despegar', token: 'despegar' },
 ];
 
 let cache = { data: null, timestamp: 0 };
