@@ -21,6 +21,13 @@ const LEVER_COMPANIES = [
   { name: 'Kavak', token: 'kavak' },
   { name: 'Talent2Win', token: 'talent2win' },
   { name: 'Despegar', token: 'despegar' },
+  { name: 'CXT Software', token: 'cxtsoftware' },
+  { name: 'Emi Labs', token: 'emilabs' },
+  { name: 'DEUNA', token: 'deuna' },
+  { name: 'Metabase', token: 'metabase' },
+  { name: 'PedidosYa', token: 'pedidosya' },
+  { name: 'Resilient Co', token: 'resilientco' },
+  { name: 'Wing', token: 'getwingapp' },
 ];
 
 let cache = { data: null, timestamp: 0 };
