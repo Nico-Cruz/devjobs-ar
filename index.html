@@ -176,19 +176,10 @@
   </div>
 
   <div class="filters">
-    <button class="chip src-btn active" onclick="setSource('all', this)">todas las fuentes</button>
-    <button class="chip src-btn" onclick="setSource('getonboard', this)">getonboard</button>
-    <button class="chip src-btn" onclick="setSource('rss', this)">indeed ar</button>
-    <button class="chip src-btn" onclick="setSource('social', this)">linkedin · x posts</button>
-    <button class="chip src-btn" onclick="setSource('company', this)">empresas ar</button>
-  </div>
-
-  <div class="filters">
-    <button class="chip days-btn" onclick="setDays(1, this)">hoy</button>
+    <button class="chip days-btn active" onclick="setDays(1, this)">hoy</button>
     <button class="chip days-btn" onclick="setDays(3, this)">3 días</button>
     <button class="chip days-btn" onclick="setDays(7, this)">7 días</button>
-    <button class="chip days-btn active" onclick="setDays(15, this)">15 días</button>
-    <button class="chip days-btn" onclick="setDays(30, this)">30 días</button>
+    <button class="chip days-btn" onclick="setDays(10, this)">10 días</button>
   </div>
 
   <div class="stats">
@@ -213,7 +204,7 @@
 </div>
 
 <script>
-  let allJobs=[], gobPage=1, activeFilter='', activeSource='all', activeDays=15, searchQuery='', loading=false;
+  let allJobs=[], gobPage=1, activeFilter='', activeSource='all', activeDays=1, searchQuery='', loading=false;
   const AR_RSS=['indeed','teamtailor'];
   const sourceLabel={getonboard:'GetOnBoard',linkedin:'LinkedIn',indeed:'Indeed AR',teamtailor:'Teamtailor',x:'X',company:'Empresa AR'};
   const FAKE_IPS=['186.22.x.x','181.96.x.x','190.210.x.x','200.45.x.x','181.47.x.x','186.57.x.x','200.114.x.x','190.191.x.x','181.164.x.x','186.139.x.x'];
@@ -249,7 +240,7 @@
       allJobs=allJobs.filter(j=>{if(seen.has(j.url))return false;seen.add(j.url);return true;});
       allJobs.sort((a,b)=>new Date(b.published_at)-new Date(a.published_at));
       gobPage++; render(); updateStats();
-      document.getElementById('load-more').style.display=gobJobs.length===20?'block':'none';
+      document.getElementById('load-more').style.display='none';
     }catch(err){
       document.getElementById('jobs-container').innerHTML=`<div class="error-msg">error cargando. reintentando...<br><small>${err.message}</small></div>`;
       setTimeout(()=>fetchAll(reset),5000);
