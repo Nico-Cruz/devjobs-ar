@@ -1,5 +1,5 @@
 // api/companies.js — Vercel Serverless Function
-// Greenhouse + Lever APIs públicas con board tokens verificados
+// Greenhouse + Lever + Ashby + Workable + Recruitee — APIs públicas sin auth
 
 const GREENHOUSE_COMPANIES = [
   { name: 'Nubank', token: 'nubank' },
@@ -8,6 +8,7 @@ const GREENHOUSE_COMPANIES = [
   { name: 'Clara', token: 'clara' },
   { name: 'Glovo', token: 'glovo' },
   { name: 'Particle41', token: 'particle41llc' },
+  { name: 'Homeward', token: 'homeward' },
 ];
 
 const LEVER_COMPANIES = [
@@ -30,6 +31,23 @@ const LEVER_COMPANIES = [
   { name: 'Wing', token: 'getwingapp' },
 ];
 
+const ASHBY_COMPANIES = [
+  { name: 'Arkho', token: 'arkho' },
+  { name: 'Uala', token: 'uala' },
+  { name: 'Pomelo', token: 'pomelo' },
+  { name: 'MobileFirst', token: 'mobilefirst' },
+];
+
+const WORKABLE_COMPANIES = [
+  { name: 'Avature', token: 'avature' },
+  { name: 'OLX Autos', token: 'olxautos' },
+];
+
+const RECRUITEE_COMPANIES = [
+  { name: 'Somnio Software', token: 'somniosoftware' },
+  { name: 'EasyApply', token: 'easyapplyrekluti' },
+];
+
 let cache = { data: null, timestamp: 0 };
 const CACHE_TTL = 30 * 60 * 1000;
 
@@ -37,8 +55,10 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
+  const { nocache } = req.query;
   const now = Date.now();
-  if (cache.data && (now - cache.timestamp) < CACHE_TTL) {
+
+  if (!nocache && cache.data && (now - cache.timestamp) < CACHE_TTL) {
     return res.json({ source: 'cache', jobs: cache.data, total: cache.data.length });
   }
 
@@ -47,13 +67,16 @@ export default async function handler(req, res) {
   await Promise.allSettled([
     ...GREENHOUSE_COMPANIES.map(c => fetchGreenhouse(c)),
     ...LEVER_COMPANIES.map(c => fetchLever(c)),
+    ...ASHBY_COMPANIES.map(c => fetchAshby(c)),
+    ...WORKABLE_COMPANIES.map(c => fetchWorkable(c)),
+    ...RECRUITEE_COMPANIES.map(c => fetchRecruitee(c)),
   ]).then(results => {
     results.forEach(r => {
       if (r.status === 'fulfilled' && r.value) allJobs.push(...r.value);
     });
   });
 
-  // Filtrar solo Argentina — más estricto
+  // Filtrar solo Argentina
   const arJobs = allJobs.filter(job => {
     const loc = (job.location || '').toLowerCase();
     return loc.includes('argentin') || loc.includes('buenos aires') ||
@@ -63,7 +86,7 @@ export default async function handler(req, res) {
            loc.includes('salta') || loc === '';
   });
 
-  // Deduplicar por título + empresa (Bluelight publica mismo job por ciudad)
+  // Deduplicar por título + empresa
   const seen = new Set();
   const dedupedJobs = arJobs.filter(job => {
     const key = `${job.company}-${job.title}`;
@@ -86,7 +109,6 @@ async function fetchGreenhouse({ name, token }) {
     );
     if (!res.ok) return [];
     const data = await res.json();
-
     return (data.jobs || []).map(job => ({
       id: `gh-${token}-${job.id}`,
       title: job.title || '',
@@ -113,13 +135,12 @@ async function fetchLever({ name, token }) {
     );
     if (!res.ok) return [];
     const data = await res.json();
-
     return (data || []).map(job => ({
       id: `lv-${token}-${job.id}`,
       title: job.text || '',
       company: name,
       url: job.hostedUrl || '',
-      location: job.categories?.location || job.tags?.join(', ') || '',
+      location: job.categories?.location || '',
       remote: /remote|remoto/i.test(job.categories?.location || ''),
       tags: extractTags(job.text + ' ' + (job.categories?.team || '')),
       source: 'company',
@@ -128,6 +149,84 @@ async function fetchLever({ name, token }) {
     }));
   } catch (err) {
     console.warn(`Lever ${name} failed:`, err.message);
+    return [];
+  }
+}
+
+async function fetchAshby({ name, token }) {
+  try {
+    const res = await fetch(
+      `https://api.ashbyhq.com/posting-api/job-board/${token}?includeCompensation=true`,
+      { signal: AbortSignal.timeout(8000) }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.jobs || []).map(job => ({
+      id: `ab-${token}-${job.id}`,
+      title: job.title || '',
+      company: name,
+      url: job.jobUrl || '',
+      location: job.location || '',
+      remote: job.isRemote || /remote|remoto/i.test(job.location || ''),
+      tags: extractTags(job.title + ' ' + (job.department || '')),
+      source: 'company',
+      published_at: job.publishedAt || new Date().toISOString(),
+      time: timeAgo(job.publishedAt),
+    }));
+  } catch (err) {
+    console.warn(`Ashby ${name} failed:`, err.message);
+    return [];
+  }
+}
+
+async function fetchWorkable({ name, token }) {
+  try {
+    const res = await fetch(
+      `https://apply.workable.com/api/v1/widget/accounts/${token}`,
+      { signal: AbortSignal.timeout(8000) }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.jobs || []).map(job => ({
+      id: `wk-${token}-${job.shortcode}`,
+      title: job.title || '',
+      company: name,
+      url: `https://apply.workable.com/${token}/j/${job.shortcode}`,
+      location: job.location?.city || job.location?.country || '',
+      remote: job.remote || false,
+      tags: extractTags(job.title || ''),
+      source: 'company',
+      published_at: job.published_on || new Date().toISOString(),
+      time: timeAgo(job.published_on),
+    }));
+  } catch (err) {
+    console.warn(`Workable ${name} failed:`, err.message);
+    return [];
+  }
+}
+
+async function fetchRecruitee({ name, token }) {
+  try {
+    const res = await fetch(
+      `https://${token}.recruitee.com/api/offers/?kind=job`,
+      { signal: AbortSignal.timeout(8000) }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.offers || []).map(job => ({
+      id: `rt-${token}-${job.id}`,
+      title: job.title || '',
+      company: name,
+      url: job.careers_url || `https://${token}.recruitee.com/o/${job.slug}`,
+      location: job.location || job.city || '',
+      remote: /remote|remoto/i.test(job.location || ''),
+      tags: extractTags(job.title + ' ' + (job.department || '')),
+      source: 'company',
+      published_at: job.created_at || new Date().toISOString(),
+      time: timeAgo(job.created_at),
+    }));
+  } catch (err) {
+    console.warn(`Recruitee ${name} failed:`, err.message);
     return [];
   }
 }
